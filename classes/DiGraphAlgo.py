@@ -67,7 +67,7 @@ class DiGraphAlgo(GraphAlgoInterface):
 
 
         loaded_graph = DiGraph()
-        data = json.load(data)
+        data = json_content
 
         for node in data['Nodes']:
             if 'pos' in node.keys():

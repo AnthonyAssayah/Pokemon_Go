@@ -30,7 +30,7 @@ class Node:
         return self.tag > other.get_tag()
 
     def __str__(self):
-        return str(self.key)
+        return str(self.key) + str(self.location)
 
     # Return the key of the node
     def get_key(self) -> int:

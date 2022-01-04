@@ -10,6 +10,9 @@ from pygame import gfxdraw
 import pygame
 from pygame import *
 from classes.DiGraphAlgo import DiGraphAlgo
+from classes.DiGraph import DiGraph
+from classes.Node import Node
+from classes.Edge import Edge
 import sys
 
 # init pygame
@@ -93,11 +96,17 @@ def assign_edges() -> []:  # list of (int, int) tuples
     pokemons = json.loads(client.get_pokemons(), object_hook=lambda d: SimpleNamespace(**d)).Pokemons
     pokemons = [p.Pokemon for p in pokemons]
 
-    ret = []
+    ret = {}
     for p in pokemons:
         x, y, _ = p.pos.split(',')
         src, dest = get_edge(p)
-        ret[p] = (src, dest)
+        print(str(src) + "----" + str(dest))
+        print(str(type(src))+"*****"+str(type(dest)))
+        print(str(p.type))
+        if src is None and dest is None:
+            return None
+
+        ret[0] = (src, dest)
     return ret
 
 
@@ -114,7 +123,7 @@ def get_edge(pokemon) -> (int, int):
             dest_loc = DWGA.get_graph().get_all_v()[e.get_destination()].location()
             m2 = (dest_loc[1] - n.pos.location()[1])/(dest_loc[0] - n.pos.location()[0])
 
-            eps = 0.000001
+            eps = 0.0000001
 
             if m2 + eps > m1 > m2 - eps:
                 #diraction
@@ -123,16 +132,56 @@ def get_edge(pokemon) -> (int, int):
                     return (n.get_key(), e.get_destination()) if (p.type() < 0) else (e.get_destination(), n.get_key())
                 else:
 
-                    return (e.get_destination(), n.get_key()) if (p.type() > 0) else (n.get_key(), e.get_destination())
+                    return (e.get_destination(), n.get_key()) if (pokemon.type > 0) else (n.get_key(), e.get_destination())
+    return None, None
+
+
+def get_agent(id) :
+    for agent in agents:
+        if id == agent.id:
+            return agent
     return None
 
+def matchagent(call) -> int:  # gets call in the form of a tuple (src_id, dest_id) representing the edge on which the pokemon is located. returns assigned agent id
+    bestagent = None  # if stays none , no avalible agent
+    min = sys.float_info.max
+    for agent in agents:
+
+        # if queues[agent.id] is None:
+        #     queues[agent.id] = queue.Queue()
+
+        if agent.dest == -1 and len(queues[agent.id]) == 0:
+            tmp = dijkstra_distances[agent.id][call[0]]
+            if tmp < min:
+                min = tmp
+                bestagent = agent.id
+    return bestagent
 
 dijkstra_paths = {}
 dijkstra_distances = {}
 for n in DWGA.get_graph().get_all_v().values():
-    dijkstra_paths[n.get_key()], dijkstra_distances = DWGA.dijkstra(n.get_key())
+    dijkstra_paths[n.get_key()], dijkstra_distances[n.get_key()] = DWGA.dijkstra(n.get_key())
 
-queues = []
+agents = json.loads(client.get_agents(), object_hook=lambda d: SimpleNamespace(**d)).Agents
+agents = [agent.Agent for agent in agents]
+queues = {}
+for agent in agents:
+    queues[agent.id] = []
+
+
+
+def shortest_path(src, dest):
+    djk = dijkstra_paths[src]
+    path = []
+    cur = dest
+    if cur not in djk:
+        return []
+    while cur != src:
+        path.append(cur)
+        cur = djk[cur]
+    path.append(src)
+    path.reverse()
+    return path
 
 while client.is_running() == 'true':
     pokemons = json.loads(client.get_pokemons(),
@@ -204,17 +253,28 @@ while client.is_running() == 'true':
     # refresh rate
     clock.tick(60)
 
-
     list = assign_edges()
+    # queues = [a]
+
+    for p in pokemons:
+        agent_id = matchagent(list[0])
+        if agent_id is None:
+            continue
+
+        path = shortest_path(get_agent(agent_id).src, list[0][0])
+        for node in path:
+            queues[agent_id].append(node)
+
+        queues[agent_id].append(list[0][1])
 
 
     # choose next edge
     for agent in agents:
 
-        if agent.dest == -1 and not queues[agent.id].empty():
+        if agent.dest == -1 and not len(queues[agent.id]) == 0:
 
-            next_node = queues[id].pop()
-            client.choose('{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
+            next_node = queues[agent.id].pop()
+            client.choose_next_edge('{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
             ttl = client.time_to_end()
             print(ttl, client.get_info())
 
