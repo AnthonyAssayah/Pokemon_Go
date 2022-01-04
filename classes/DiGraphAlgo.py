@@ -87,6 +87,7 @@ class DiGraphAlgo(GraphAlgoInterface):
         for edge in data['Edges']:
             loaded_graph.add_edge(edge['src'], edge['dest'], edge['w'])
         self.DWG = loaded_graph
+
         return True
 
     def save_to_json(self, file_name: str) -> bool:

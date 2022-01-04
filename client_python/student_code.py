@@ -292,4 +292,5 @@ while client.is_running() == 'true':
             print(ttl, client.get_info())
 
     client.move()
+
 # game over:
