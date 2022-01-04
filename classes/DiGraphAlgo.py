@@ -63,13 +63,14 @@ class DiGraphAlgo(GraphAlgoInterface):
         finally:
             json_file.close()
 
-    def load_from_json(self, data: str) -> bool:
 
+    def load_from_json2(self, json_content) -> bool:
 
         loaded_graph = DiGraph()
         data = json_content
 
         for node in data['Nodes']:
+
             if 'pos' in node.keys():
                 position = node['pos']
                 spl = position.split(",")

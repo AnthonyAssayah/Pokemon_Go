@@ -3,6 +3,14 @@
 OOP - Ex4
 Very simple GUI example for python client to communicates with the server and "play the game!"
 """
+
+
+
+
+# הככין אנדקס לכל הפוקמונים
+import multiprocessing
+import queue
+from collections import defaultdict
 from types import SimpleNamespace
 from client import Client
 import json
@@ -45,7 +53,7 @@ graph = json.loads(
     graph_json, object_hook=lambda json_dict: SimpleNamespace(**json_dict))
 # --------------------------------------------
 DWGA = DiGraphAlgo()
-DWGA.load_from_json(graph_json)
+DWGA.load_from_json2(json.loads(graph_json))
 # --------------------------------------------
 for n in graph.Nodes:
     x, y, _ = n.pos.split(',')
@@ -112,24 +120,29 @@ def assign_edges() -> []:  # list of (int, int) tuples
 
 def get_edge(pokemon) -> (int, int):
 
-    x = float(p.pos.split(',')[0])
-    y = float(p.pos.split(',')[1])
+    x = float(pokemon.pos.split(',')[0])
+    y = float(pokemon.pos.split(',')[1])
 
     for n in DWGA.get_graph().get_all_v().values():
 
-        for e in n.get_out():
-            # check if the slope between src
-            m1 = (y - n.pos.location()[1])/(x - n.pos.location()[0])
-            dest_loc = DWGA.get_graph().get_all_v()[e.get_destination()].location()
-            m2 = (dest_loc[1] - n.pos.location()[1])/(dest_loc[0] - n.pos.location()[0])
+        for e in n.get_out().values():
+
+            # check if the slope between src and pokemon is equal to the slope between the src and dest
+            m1 = (y - n.location[1]) / (x - n.location[0])
+            dest_loc = DWGA.get_graph().get_all_v()[e.get_destination()].location
+            m2 = (dest_loc[1] - n.location[1])/(dest_loc[0] - n.location[0])
+
+            inrangex = min(n.location[0], dest_loc[0]) <= x <= max(n.location[0], dest_loc[0])
+            inrangey = min(n.location[1], dest_loc[1]) <= y <= max(n.location[1], dest_loc[1])
 
             eps = 0.0000001
 
-            if m2 + eps > m1 > m2 - eps:
+            if m2 + eps > m1 > m2 - eps and inrangex and inrangey:
+
                 #diraction
                 if n.get_key() < e.get_destination():
 
-                    return (n.get_key(), e.get_destination()) if (p.type() < 0) else (e.get_destination(), n.get_key())
+                    return (n.get_key(), e.get_destination()) if (pokemon.type < 0) else (e.get_destination(), n.get_key())
                 else:
 
                     return (e.get_destination(), n.get_key()) if (pokemon.type > 0) else (n.get_key(), e.get_destination())
@@ -268,7 +281,7 @@ while client.is_running() == 'true':
         queues[agent_id].append(list[0][1])
 
 
-    # choose next edge
+    # choose next edge  q =[]
     for agent in agents:
 
         if agent.dest == -1 and not len(queues[agent.id]) == 0:
