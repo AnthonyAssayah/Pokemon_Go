@@ -108,13 +108,13 @@ def assign_edges() -> []:  # list of (int, int) tuples
     for p in pokemons:
         x, y, _ = p.pos.split(',')
         src, dest = get_edge(p)
-        print(str(src) + "----" + str(dest))
-        print(str(type(src))+"*****"+str(type(dest)))
-        print(str(p.type))
+       # print(str(src) + "----" + str(dest))
+
         if src is None and dest is None:
             return None
 
         ret[0] = (src, dest)
+
     return ret
 
 
@@ -149,13 +149,15 @@ def get_edge(pokemon) -> (int, int):
     return None, None
 
 
-def get_agent(id) :
+def get_agent(id):
     for agent in agents:
         if id == agent.id:
+            print("AGENT ID >>  "+ str(agent.id))
             return agent
     return None
 
-def matchagent(call) -> int:  # gets call in the form of a tuple (src_id, dest_id) representing the edge on which the pokemon is located. returns assigned agent id
+def matchagent(call) -> int:     # gets call in the form of a tuple (src_id, dest_id) representing the edge on which the pokemon is located. returns assigned agent id
+
     bestagent = None  # if stays none , no avalible agent
     min = sys.float_info.max
     for agent in agents:
@@ -289,7 +291,7 @@ while client.is_running() == 'true':
             next_node = queues[agent.id].pop()
             client.choose_next_edge('{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
             ttl = client.time_to_end()
-            print(ttl, client.get_info())
+          #  print(ttl, client.get_info())
 
     client.move()
 
