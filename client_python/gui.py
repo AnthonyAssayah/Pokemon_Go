@@ -1,7 +1,7 @@
 import json
 from types import SimpleNamespace
 import pygame
-import pygame_gui
+
 from pygame import RESIZABLE, VIDEORESIZE, gfxdraw, display
 # default port
 from classes.DiGraphAlgo import DiGraphAlgo

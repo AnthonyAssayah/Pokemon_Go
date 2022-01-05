@@ -5,14 +5,19 @@ Very simple GUI example for python client to communicates with the server and "p
 """
 
 
+
+
 # הככין אנדקס לכל הפוקמונים
 import multiprocessing
 import queue
+import socket
 from collections import defaultdict
 from types import SimpleNamespace
 from client import Client
 import json
 from pygame import gfxdraw
+from math import sqrt
+from math import pow
 import pygame
 from pygame import *
 from classes.DiGraphAlgo import DiGraphAlgo
@@ -22,6 +27,8 @@ from classes.Edge import Edge
 import sys
 
 # init pygame
+from client_python import gui
+
 WIDTH, HEIGHT = 1080, 720
 
 # default port
@@ -128,16 +135,15 @@ def get_edge(pokemon) -> (int, int):
             # check if the slope between src and pokemon is equal to the slope between the src and dest
             m1 = (y - n.location[1]) / (x - n.location[0])
             dest_loc = DWGA.get_graph().get_all_v()[e.get_destination()].location
-            m2 = (dest_loc[1] - n.location[1])/(dest_loc[0] - n.location[0])
+            src_loc = n.location
+            src_to_dest = sqrt(pow(dest_loc[0] - src_loc[0], 2) + pow(dest_loc[1] - src_loc[1], 2))
+            src_to_poke = sqrt(pow(x - src_loc[0], 2) + pow(y - src_loc[1], 2))
+            poke_to_dest = sqrt(pow(dest_loc[0] - x, 2) + pow(dest_loc[1] - y, 2))
+            eps = 0.0001
+            # direction
 
-            inrangex = min(n.location[0], dest_loc[0]) <= x <= max(n.location[0], dest_loc[0])
-            inrangey = min(n.location[1], dest_loc[1]) <= y <= max(n.location[1], dest_loc[1])
+            if src_to_poke + poke_to_dest <= src_to_dest + eps:
 
-            eps = 0.0000001
-
-            if m2 + eps > m1 > m2 - eps and inrangex and inrangey:
-
-                #diraction
                 if n.get_key() < e.get_destination():
 
                     return (n.get_key(), e.get_destination()) if (pokemon.type < 0) else (e.get_destination(), n.get_key())
@@ -150,7 +156,6 @@ def get_edge(pokemon) -> (int, int):
 def get_agent(id):
     for agent in agents:
         if id == agent.id:
-            print("AGENT ID >>  "+ str(agent.id))
             return agent
     return None
 
@@ -280,7 +285,7 @@ while client.is_running() == 'true':
 
         queues[agent_id].append(list[0][1])
 
-
+    clock.tick(10)
     # choose next edge  q =[]
     for agent in agents:
 
@@ -288,9 +293,11 @@ while client.is_running() == 'true':
 
             next_node = queues[agent.id].pop()
             client.choose_next_edge('{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
+
             ttl = client.time_to_end()
-          #  print(ttl, client.get_info())
+            print(ttl, client.get_info())
+
 
     client.move()
 
-# game over:
+
