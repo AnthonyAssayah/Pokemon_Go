@@ -5,8 +5,6 @@ Very simple GUI example for python client to communicates with the server and "p
 """
 
 
-
-
 # הככין אנדקס לכל הפוקמונים
 import multiprocessing
 import queue
@@ -286,7 +284,7 @@ while client.is_running() == 'true':
     # choose next edge  q =[]
     for agent in agents:
 
-        if agent.dest == -1 and not len(queues[agent.id]) == 0:
+        while (agent.dest == -1 and not len(queues[agent.id]) == 0):
 
             next_node = queues[agent.id].pop()
             client.choose_next_edge('{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
