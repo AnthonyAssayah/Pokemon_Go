@@ -150,7 +150,6 @@ def get_edge(pokemon) -> (int, int):
 def get_agent(id):
     for agent in agents:
         if id == agent.id:
-            print("AGENT ID >>  "+ str(agent.id))
             return agent
     return None
 
@@ -280,15 +279,8 @@ while client.is_running() == 'true':
 
         queues[agent_id].append(list[0][1])
 
-
     # choose next edge  q =[]
-    for agent in agents:
 
-        while (agent.dest == -1 and not len(queues[agent.id]) == 0):
-
-            next_node = queues[agent.id].pop()
-            client.choose_next_edge('{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
-            ttl = client.time_to_end()
           #  print(ttl, client.get_info())
 
     client.move()

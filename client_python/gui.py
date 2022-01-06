@@ -74,7 +74,8 @@ client.start()
 # play gui
 is_running = True
 while is_running:
-    time_delta = clock.tick(60) / 1000.0
+
+    # time_delta = clock.tick(60) / 1000.0
     pokemons = json.loads(client.get_pokemons(),
                           object_hook=lambda d: SimpleNamespace(**d)).Pokemons
     pokemons = [p.Pokemon for p in pokemons]
@@ -94,10 +95,10 @@ while is_running:
             is_running = False
             pygame.quit()
             exit(0)
-        #resize event
+        # resize event
         elif event.type == VIDEORESIZE:
             window_surface = pygame.display.set_mode(
-            event.dict['size'], RESIZABLE)
+                event.dict['size'], RESIZABLE)
             window_surface.blit(pygame.transform.scale(background, event.dict['size']), (0, 0))
 
         # draw edges
@@ -114,7 +115,7 @@ while is_running:
 
             # draw the line
             pygame.draw.line(window_surface, pygame.Color(0, 0, 0),
-                             (src_x, src_y), (dest_x, dest_y),2)
+                             (src_x, src_y), (dest_x, dest_y), 2)
 
             # draw nodes
         for n in graph.Nodes:
@@ -148,5 +149,4 @@ while is_running:
 
         # refresh rate
         clock.tick(60)
-
     pygame.display.update()
