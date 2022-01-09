@@ -139,6 +139,7 @@ class Client:
         else: returns 'false' (also str)
         """
         res = self.__send_message("isRunning")
+        print("**********************")
         return res
 
     def time_to_end(self):
@@ -180,9 +181,11 @@ class Client:
         or 2. the "next_node_id" isn't an adjacent vertex of agent.src,
         then move() won't be affected by this invalid "next_node_id" choice.
         """
+        print("-----------------------")
         res = self.__send_message("chooseNextEdge")
         if res == "getAgentAndNode":
             res = self.__send_message(next_agent_node_json)
+            print("------------g-----------")
 
     def log_in(self, id_str):
         """
