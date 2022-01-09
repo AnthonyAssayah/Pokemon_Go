@@ -1,12 +1,21 @@
 <img src="https://user-images.githubusercontent.com/92322613/148082594-2c6f0944-9ffd-4abc-a283-23137b6e866c.gif" width="850" height="260" />
 
-# Pokemon Go ! <img src="https://user-images.githubusercontent.com/92322613/148254967-f5b3e6ee-c628-42c7-907c-87140e883fe4.png" height="36"> 
+# Pokemon Go !     <img src="https://user-images.githubusercontent.com/92322613/148254967-f5b3e6ee-c628-42c7-907c-87140e883fe4.png" height="36"> 
 
 This project is our last assigment in OOP course, based on a ***Directed and Weighted Graphs*** implemented on *Python*. This exercise's goal is with the help of agents we have to catch all the Pokemon on the graph. Therefore, this task is divided in two main parts, the `Client` which set the connection between the server and us and `Student_code` where we programmed the algorithms and th Gui representation to allow us to really visualize the graph and all its parameters and options.
 
   <br />
   
-## Catch them All !
+## *Catch them All !*   
+
+  <br />
+  
+<p align="center">
+   <img width="750" height="450" src="https://user-images.githubusercontent.com/92322613/148699021-0c3d178b-4509-4050-9c76-579e01faeadd.gif">
+</p>
+  
+
+
 
   <br />
   
@@ -66,7 +75,7 @@ In this class, we programmed the most efficient algorithm in reduce to have the 
   <br />
   
 
-You can read more details about our project in the ![Wiki](https://github.com/AnthonyAssayah/Pokemon_Go/wiki) page !
+*You can read more details about our project in the [Wiki](https://github.com/AnthonyAssayah/Pokemon_Go/wiki) page !*
  
   <p align="center">
    <img width="400" height="400" src="https://github.com/jaylynch/pokemoji/raw/master/img/logo.png">
