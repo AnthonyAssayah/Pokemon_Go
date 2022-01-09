@@ -74,6 +74,13 @@ In this class, we programmed the most efficient algorithm in reduce to have the 
 
   <br />
   
+ ## How to run 💻
+  
+ For running the program, you need to first go to the folder where the `jar` is located and run the command the command prompt.
+ In the CMD, run the following command `java -jar Ex4_Server_v0.0.jar  <case> `.  ( 0-15)
+ *(For example, if you want to run the first case,  you enter in the CMD: ` java -jar Ex4_Server_v0.0.jar 0`)*.
+
+  
 
 *You can read more details about our project in the [Wiki](https://github.com/AnthonyAssayah/Pokemon_Go/wiki) page !*
  
