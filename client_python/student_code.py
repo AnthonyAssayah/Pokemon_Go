@@ -31,6 +31,7 @@ HOST = '127.0.0.1'
 pygame.init()
 
 screen = display.set_mode((WIDTH, HEIGHT), depth=32, flags=RESIZABLE)
+pygame.display.set_caption('Pokemon go!')
 clock = pygame.time.Clock()
 pygame.font.init()
 
@@ -40,12 +41,15 @@ client.start_connection(HOST, PORT)
 pokemons = client.get_pokemons()
 pokemons_obj = json.loads(pokemons, object_hook=lambda d: SimpleNamespace(**d))
 
-print(pokemons)
-
 graph_json = client.get_graph()
 
 FONT = pygame.font.SysFont('Arial', 20, bold=True)
 # load the json string into SimpleNamespace Object
+
+# set background image
+background = pygame.image.load('imeges\wallpeper.png')
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+screen.blit(pygame.transform.scale(background, (WIDTH, HEIGHT)), (0, 0))
 
 graph = json.loads(
     graph_json, object_hook=lambda json_dict: SimpleNamespace(**json_dict))
@@ -123,7 +127,7 @@ def get_edge(pokemon) -> (int, int):
 
     for n in DWGA.get_graph().get_all_v().values():
 
-        for e in n.get_out().values():
+        for e in n.get_out().keys():
 
             # check if the slope between src and pokemon is equal to the slope between the src and dest
             m1 = (y - n.location[1]) / (x - n.location[0])
@@ -143,7 +147,7 @@ def get_edge(pokemon) -> (int, int):
                     return (n.get_key(), e.get_destination()) if (pokemon.type < 0) else (e.get_destination(), n.get_key())
                 else:
 
-                    return (e.get_destination(), n.get_key()) if (pokemon.type > 0) else (n.get_key(), e.get_destination())
+                    return (e, n.get_key()) if (pokemon.type > 0) else (n.get_key(), e)
     return None, None
 
 
@@ -217,23 +221,7 @@ while client.is_running() == 'true':
             exit(0)
 
     # refresh surface
-    screen.fill(Color(0, 0, 0))
-
-    # draw nodes
-    for n in graph.Nodes:
-        x = my_scale(n.pos.x, x=True)
-        y = my_scale(n.pos.y, y=True)
-
-        # its just to get a nice antialiased circle
-        gfxdraw.filled_circle(screen, int(x), int(y),
-                              radius, Color(64, 80, 174))
-        gfxdraw.aacircle(screen, int(x), int(y),
-                         radius, Color(255, 255, 255))
-
-        # draw the node id
-        id_srf = FONT.render(str(n.id), True, Color(255, 255, 255))
-        rect = id_srf.get_rect(center=(x, y))
-        screen.blit(id_srf, rect)
+    screen.blit(pygame.transform.scale(background, (WIDTH, HEIGHT)), (0, 0))
 
     # draw edges
     for e in graph.Edges:
@@ -248,41 +236,86 @@ while client.is_running() == 'true':
         dest_y = my_scale(dest.pos.y, y=True)
 
         # draw the line
-        pygame.draw.line(screen, Color(61, 72, 126),
-                         (src_x, src_y), (dest_x, dest_y))
+        pygame.draw.line(screen, pygame.Color(0, 0, 0),
+                         (src_x, src_y), (dest_x, dest_y), 2)
+
+    # draw nodes
+    for n in graph.Nodes:
+        x = my_scale(n.pos.x, x=True)
+        y = my_scale(n.pos.y, y=True)
+        # pokeball nodes
+        poke = pygame.image.load('imeges/pokeball.png')
+        rect2 = poke.get_rect(center=(x, y))
+        screen.blit(poke, rect2)
+
+        # draw the node id
+        id_srf = FONT.render(str(n.id), True, pygame.Color(0, 0, 0))
+        rect = id_srf.get_rect(center=(x + 3, y - 3.2))
+        screen.blit(id_srf, rect)
+
 
     # draw agents
     for agent in agents:
-        pygame.draw.circle(screen, Color(122, 61, 23),
-                           (int(agent.pos.x), int(agent.pos.y)), 10)
+        # pygame.draw.circle(screen, Color(122, 61, 23),
+        #                    (int(agent.pos.x), int(agent.pos.y)), 10)
+        # ashe agents
+        ashe = pygame.image.load('imeges/ashagent.png')
+        rect2 = ashe.get_rect(center=(agent.pos.x, agent.pos.y))
+        screen.blit(ashe, rect2)
+
     # draw pokemons (note: should differ (GUI wise) between the up and the down pokemons (currently they are marked in the same way).
     for p in pokemons:
-        pygame.draw.circle(screen, Color(0, 255, 255), (int(p.pos.x), int(p.pos.y)), 10)
+        # pygame.draw.circle(screen, Color(0, 255, 255), (int(p.pos.x), int(p.pos.y)), 10)
+        pika = pygame.image.load('imeges/pika.png')
+        rect2 = pika.get_rect(center=(p.pos.x, p.pos.y))
+        screen.blit(pika, rect2)
 
     # update screen changes
     display.update()
 
     # refresh rate
-    clock.tick(60)
+    clock.tick(10)
 
-    list = assign_edges()
-    # queues = [a]
+    taken_agents = {}
+    print("taken_agents: " + str(taken_agents.keys()))
+    if len(taken_agents) != len(agents):
 
-    for p in pokemons:
-        agent_id = matchagent(list[0])
-        if agent_id is None:
-            continue
+        list = assign_edges(pokemons, taken_agents)
 
-        path = shortest_path(get_agent(agent_id).src, list[0][0])
-        for node in path:
-            queues[agent_id].append(node)
+        # queues = [a]
+        for p in pokemons:
+            agent_id = None
+            if str(p) in taken_agents.values():
+                continue
 
-        queues[agent_id].append(list[0][1])
+            if len(list) != 0:
+                print("list: " + str(list))
+                poke_edge = list[len(list) - 1]
+                print("poke_edge: " + str(poke_edge))
+                agent_id = matchagent(poke_edge, taken_agents)
+                list.pop(len(list) - 1)
+                print("THE BEST AGENT :" + str(agent_id))
 
-    # choose next edge  q =[]
+            if agent_id is None:
+                break
 
-          #  print(ttl, client.get_info())
+            taken_agents[agent_id] = str(p)
+            # adds the path to the agent's queue
+            path = shortest_path(get_agent(agent_id).src, poke_edge[0])
+            for node in path:
+                queues[agent_id].append(node)
+            # adds the last edge to the agent's queue
+            queues[agent_id].append(poke_edge[1])
 
+    for agent in agents:
+        if len(queues[agent.id]) == 0 and agent.id in taken_agents and agent.dest == -1:
+            print("agent " + str(agent.id) + " is now free")
+            taken_agents.pop(agent.id)
+
+        while agent.dest == -1 and not len(queues[agent.id]) == 0:
+            next_node = queues[agent.id].pop()
+            client.choose_next_edge('{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
+        ttl = client.time_to_end()
     client.move()
 
 # game over:
