@@ -61,5 +61,9 @@ In this class, we programmed the most efficient algorithm in reduce to have the 
   <br />
   
 
-You can read more details about our project in the Wiki page !
-![Pokemoji](https://github.com/jaylynch/pokemoji/raw/master/img/logo.png)
+You can read more details about our project in the ![Wiki](https://github.com/AnthonyAssayah/Pokemon_Go/wiki) page !
+ 
+  <p align="center">
+   <img width="400" height="400" src="https://github.com/jaylynch/pokemoji/raw/master/img/logo.png">
+</p>
+
