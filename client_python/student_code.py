@@ -3,9 +3,6 @@
 OOP - Ex4
 Very simple GUI example for python client to communicates with the server and "play the game!"
 """
-
-
-# הככין אנדקס לכל הפוקמונים
 import multiprocessing
 import queue
 from collections import defaultdict
@@ -20,6 +17,8 @@ from classes.DiGraph import DiGraph
 from classes.Node import Node
 from classes.Edge import Edge
 import sys
+from math import sqrt
+from math import pow
 
 # init pygame
 WIDTH, HEIGHT = 1080, 720
@@ -86,11 +85,12 @@ def my_scale(data, x=False, y=False):
 
 
 radius = 15
-
-client.add_agent("{\"id\":0}")
-# client.add_agent("{\"id\":1}")
-# client.add_agent("{\"id\":2}")
-# client.add_agent("{\"id\":3}")
+game_info = json.loads(client.get_info())
+center = DWGA.centerPoint()[0]
+number_of_agents = game_info['GameServer']['agents']
+#center - (number_of_agents / 2) + i
+for i in range(number_of_agents):
+   client.add_agent("{\"id\":" + str(i) + "}")
 
 # this commnad starts the server - the game is running now
 client.start()
@@ -111,50 +111,56 @@ The GUI and the "algo" are mixed - refactoring using MVC design pattern is requi
 """
 
 
-def assign_edges() -> []:  # list of (int, int) tuples
+def assign_edges(pokemons, taken_agents) -> []:  # list of (int, int) tuples
 
-    pokemons = json.loads(client.get_pokemons(), object_hook=lambda d: SimpleNamespace(**d)).Pokemons
-    pokemons = [p.Pokemon for p in pokemons]
-
-    ret = {}
+    ret = []
     for p in pokemons:
-        x, y, _ = p.pos.split(',')
+
         src, dest = get_edge(p)
-       # print(str(src) + "----" + str(dest))
+        already_in = False
+        for x, y in taken_agents.values():
+            if src == x and dest == y:
+                already_in = True
+
+        if already_in:
+            continue
+        # if src in list(zip(*list(taken_agents.values())))[0] and dest in list(zip(*list(taken_agents.values())))[1]:
+        #     continue
+
+        if (src, dest) in taken_agents.values():
+            continue
 
         if src is None and dest is None:
             return None
 
-        ret[0] = (src, dest)
+        ret.append((src, dest))
 
     return ret
 
 
 def get_edge(pokemon) -> (int, int):
 
-    x = float(pokemon.pos.split(',')[0])
-    y = float(pokemon.pos.split(',')[1])
+    x = pokemon.pos.x
+    y = pokemon.pos.y
 
     for n in DWGA.get_graph().get_all_v().values():
 
         for e in n.get_out().keys():
 
-            # check if the slope between src and pokemon is equal to the slope between the src and dest
-            m1 = (y - n.location[1]) / (x - n.location[0])
-            dest_loc = DWGA.get_graph().get_all_v()[e.get_destination()].location
-            m2 = (dest_loc[1] - n.location[1])/(dest_loc[0] - n.location[0])
+            src_pos_x = my_scale(n.location[0], x=True)
+            src_pos_y = my_scale(n.location[1], y=True)
+            dest_pos_x = my_scale(DWGA.get_graph().get_all_v()[e].location[0], x=True)
+            dest_pos_y = my_scale(DWGA.get_graph().get_all_v()[e].location[1], y=True)
 
-            inrangex = min(n.location[0], dest_loc[0]) <= x <= max(n.location[0], dest_loc[0])
-            inrangey = min(n.location[1], dest_loc[1]) <= y <= max(n.location[1], dest_loc[1])
+            src_to_dest = sqrt(pow(src_pos_x - dest_pos_x, 2) + pow(src_pos_y - dest_pos_y, 2))
+            src_to_poke = sqrt(pow(src_pos_x - x, 2) + pow(src_pos_y - y, 2))
+            poke_to_dest = sqrt(pow(x - dest_pos_x, 2) + pow(y - dest_pos_y, 2))
+            eps = 0.000001
+            if src_to_dest + eps >= src_to_poke + poke_to_dest:
 
-            eps = 0.0000001
+                if n.get_key() < e:
 
-            if m2 + eps > m1 > m2 - eps and inrangex and inrangey:
-
-                #diraction
-                if n.get_key() < e.get_destination():
-
-                    return (n.get_key(), e.get_destination()) if (pokemon.type < 0) else (e.get_destination(), n.get_key())
+                    return (n.get_key(), e) if (pokemon.type < 0) else (e, n.get_key())
                 else:
 
                     return (e, n.get_key()) if (pokemon.type > 0) else (n.get_key(), e)
@@ -167,14 +173,13 @@ def get_agent(id):
             return agent
     return None
 
-def matchagent(call) -> int:     # gets call in the form of a tuple (src_id, dest_id) representing the edge on which the pokemon is located. returns assigned agent id
+def matchagent(call, taken_agents) -> int:     # gets call in the form of a tuple (src_id, dest_id) representing the edge on which the pokemon is located. returns assigned agent id
 
     bestagent = None  # if stays none , no avalible agent
     min = sys.float_info.max
     for agent in agents:
-
-        # if queues[agent.id] is None:
-        #     queues[agent.id] = queue.Queue()
+        if agent.id in taken_agents.keys():
+            continue
 
         if agent.dest == -1 and len(queues[agent.id]) == 0:
             tmp = dijkstra_distances[agent.id][call[0]]
@@ -189,6 +194,7 @@ for n in DWGA.get_graph().get_all_v().values():
     dijkstra_paths[n.get_key()], dijkstra_distances[n.get_key()] = DWGA.dijkstra(n.get_key())
 
 agents = json.loads(client.get_agents(), object_hook=lambda d: SimpleNamespace(**d)).Agents
+
 agents = [agent.Agent for agent in agents]
 queues = {}
 for agent in agents:
@@ -207,6 +213,9 @@ def shortest_path(src, dest):
     path.append(src)
     path.reverse()
     return path
+
+taken_agents = {}
+assigned_edges = []
 
 while client.is_running() == 'true':
     pokemons = json.loads(client.get_pokemons(),
@@ -302,40 +311,29 @@ while client.is_running() == 'true':
     # refresh rate
     clock.tick(10)
 
-    taken_agents = {}
     print("taken_agents: " + str(taken_agents.keys()))
     if len(taken_agents) != len(agents):
 
-        list = assign_edges(pokemons, taken_agents)
+        assigned_edges = assign_edges(pokemons, taken_agents)
 
-        # queues = [a]
-        for p in pokemons:
-            agent_id = None
-            if str(p) in taken_agents.values():
-                continue
-
-            if len(assigned_edges) != 0:
-                print("list: " + str(assigned_edges))
-                poke_edge = assigned_edges[0]
-                print("poke_edge: " + str(poke_edge))
-                agent_id = matchagent(poke_edge, taken_agents)
-                assigned_edges.pop(0)
-                print("THE BEST AGENT :" + str(agent_id))
-
-            if agent_id is None:
-                break
-
-            taken_agents[agent_id] = str(p)
-            # adds the path to the agent's queue
-            path = shortest_path(get_agent(agent_id).src, poke_edge[0])
-            for node in path:
-                queues[agent_id].append(node)
-            # adds the last edge to the agent's queue
-            queues[agent_id].append(poke_edge[1])
+        for agent in agents:
+            if agent.id not in taken_agents.keys():
+                min_dist = sys.float_info.max
+                for e in assigned_edges:
+                    if min_dist > dijkstra_distances[agent.src][e[0]]:
+                        min_dist = dijkstra_distances[agent.src][e[0]]
+                        poke_edge = e
+                # adds the path to the agent's queue
+                path = shortest_path(get_agent(agent.id).src, poke_edge[0])
+                for node in path:
+                    queues[agent.id].append(node)
+                # adds the last edge to the agent's queue
+                queues[agent.id].append(poke_edge[1])
+                taken_agents[agent.id] = e
 
     for agent in agents:
         if len(queues[agent.id]) == 0 and agent.id in taken_agents and agent.dest == -1:
-            print("agent " + str(agent.id) + " is now free")
+            print("agent " + str(agent.id) + " completed " + str(taken_agents[agent.id][0]) + " " + str(taken_agents[agent.id][1]))
             taken_agents.pop(agent.id)
 
         while agent.dest == -1 and not len(queues[agent.id]) == 0:
