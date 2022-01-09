@@ -99,11 +99,12 @@ drawing the stop button.
 """
 text = "stop"
 font = pygame.font.Font(None, 34)
-txt_surface = font.render(text, True, 'BLACK', 'PINK')
-input_box = pygame.Rect(150, 10, 130, 32)
-dark_color = 'PINK'
-screen.blit(txt_surface, (191, 15))
-pygame.draw.rect(screen, dark_color, input_box, 2)
+txt = font.render(text, True, 'BLACK', 'PINK')
+input_rect = pygame.Rect(150, 10, 130, 32)
+input_rect.topleft
+color = 'PINK'
+screen.blit(txt, (190, 15))
+pygame.draw.rect(screen, color, input_rect, 2)
 pause = False
 """
 The code below should be improved significantly:
@@ -239,24 +240,13 @@ while client.is_running() == 'true':
             exit(0)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse = pygame.mouse.get_pos()
-            if 150 <= mouse[0] <= 150 + 130 and 10 <= mouse[1] <= 32:
-                pause = True
-                text = 'start'
-                txt_surface = font.render(text, True, 'BLACK', 'PINK')
-                pygame.time.delay(3000)
-            else:
-                pause = False
-                text = 'pause'
-                txt_surface = font.render(text, True, 'BLACK', 'PINK')
-                pygame.time.delay(0)
-
-
-
+            if 200 <= mouse[0] <= 200 + 150 and 15 <= mouse[1] <= 30:
+                client.stop()
 
             # refresh surface
     screen.blit(pygame.transform.scale(background, (WIDTH, HEIGHT)), (0, 0))
-    screen.blit(txt_surface, (191, 15))
-    pygame.draw.rect(screen, dark_color, input_box, 2)
+    screen.blit(txt, (191, 15))
+    pygame.draw.rect(screen, color, input_rect, 2)
 
     # draw edges
     for e in graph.Edges:
