@@ -94,7 +94,17 @@ client.add_agent("{\"id\":0}")
 
 # this commnad starts the server - the game is running now
 client.start()
-
+"""
+drawing the stop button.
+"""
+text = "stop"
+font = pygame.font.Font(None, 34)
+txt_surface = font.render(text, True, 'BLACK', 'PINK')
+input_box = pygame.Rect(150, 10, 130, 32)
+dark_color = 'PINK'
+screen.blit(txt_surface, (191, 15))
+pygame.draw.rect(screen, dark_color, input_box, 2)
+pause = False
 """
 The code below should be improved significantly:
 The GUI and the "algo" are mixed - refactoring using MVC design pattern is required.
@@ -218,9 +228,26 @@ while client.is_running() == 'true':
         if event.type == pygame.QUIT:
             pygame.quit()
             exit(0)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse = pygame.mouse.get_pos()
+            if 150 <= mouse[0] <= 150 + 130 and 10 <= mouse[1] <= 32:
+                pause = True
+                text = 'start'
+                txt_surface = font.render(text, True, 'BLACK', 'PINK')
+                pygame.time.delay(3000)
+            else:
+                pause = False
+                text = 'pause'
+                txt_surface = font.render(text, True, 'BLACK', 'PINK')
+                pygame.time.delay(0)
 
-    # refresh surface
+
+
+
+            # refresh surface
     screen.blit(pygame.transform.scale(background, (WIDTH, HEIGHT)), (0, 0))
+    screen.blit(txt_surface, (191, 15))
+    pygame.draw.rect(screen, dark_color, input_box, 2)
 
     # draw edges
     for e in graph.Edges:
