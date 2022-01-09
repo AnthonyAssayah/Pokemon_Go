@@ -4,11 +4,16 @@
 
 This project is our last assigment in OOP course, based on a ***Directed and Weighted Graphs*** implemented on *Python*. This exercise's goal is with the help of agents we have to catch all the Pokemon on the graph. Therefore, this task is divided in two main parts, the `Client` which set the connection between the server and us and `Student_code` where we programmed the algorithms and th Gui representation to allow us to really visualize the graph and all its parameters and options.
 
+  <br />
+  
+## Catch them All !
 
-## Catch them All ! 
+  <br />
+  
+## Design ![blob-pkmn-ghastly](https://user-images.githubusercontent.com/92322613/148676805-8841ad20-fdd1-4b6f-8915-0b9b86e526d7.png)
 
-## Design 📌
-
+  <br />
+  
 There are 3 principal classes defined in this project, we also used the different classes and interfaces from our last Python project [*EX3_OPP*](https://github.com/AnthonyAssayah/EX3_OPP.git), the interfaces are in the ```api``` package and their implementations can be found in ```classes``` package. Their properties and methods are detailed in our previous project. 
  - *Node*
  - *Edge*
