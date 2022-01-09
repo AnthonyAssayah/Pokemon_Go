@@ -67,7 +67,7 @@ In this class, we programmed the most efficient algorithm in reduce to have the 
 | `scale(data, min_screen, max_screen, min_data, max_data)` | Get the scale proportions and maximize it relatively to min and max screen dimentions. |
 | `my_scale(data, x=False, y=False)` | Decorate scale with the correct values. |
 | `assign_edges() -> []` | Assign the edge where the pokemon is from the json str. |
-| `get_edge(pokemon) -> (int, int)` | . |
+| `get_edge(pokemon) -> (int, int)` | Returns a tuple of the location of the src and the dst where the Pokemon is. |
 | `get_agent(id)` | Returns the agent having this id. |
 | `matchagent(call) -> int` | Gets call in the form of a tuple (src_id, dest_id) representing the edge on which the pokemon is located. returns assigned agent id.|
 | `shortest_path(src, dest)` | Returns the shortest path from src to dst using Dijkstra. |
