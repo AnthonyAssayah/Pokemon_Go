@@ -185,7 +185,6 @@ for agent in agents:
     queues[agent.id] = []
 
 
-
 def shortest_path(src, dest):
     djk = dijkstra_paths[src]
     path = []
@@ -288,12 +287,12 @@ while client.is_running() == 'true':
             if str(p) in taken_agents.values():
                 continue
 
-            if len(list) != 0:
-                print("list: " + str(list))
-                poke_edge = list[len(list) - 1]
+            if len(assigned_edges) != 0:
+                print("list: " + str(assigned_edges))
+                poke_edge = assigned_edges[0]
                 print("poke_edge: " + str(poke_edge))
                 agent_id = matchagent(poke_edge, taken_agents)
-                list.pop(len(list) - 1)
+                assigned_edges.pop(0)
                 print("THE BEST AGENT :" + str(agent_id))
 
             if agent_id is None:
