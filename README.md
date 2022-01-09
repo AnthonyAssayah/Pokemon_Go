@@ -2,14 +2,21 @@
 
 # Pokemon Go ! <img src="https://user-images.githubusercontent.com/92322613/148254967-f5b3e6ee-c628-42c7-907c-87140e883fe4.png" height="36"> 
 
-This project is our last assigment in OOP course, based on a ***Directed and Weighted Graphs*** implemented on *Python*. This exercise's goal is with the help of agents we have to catch all the Pokemon on the graph. Therefore, this task is divided in two main parts, the `Client` which set the connection between the server and us and `Student_code` where we programmed the algorithms and th Gui representation to allow us to really visualize the graph and all its parameters and options. 
+This project is our last assigment in OOP course, based on a ***Directed and Weighted Graphs*** implemented on *Python*. This exercise's goal is with the help of agents we have to catch all the Pokemon on the graph. Therefore, this task is divided in two main parts, the `Client` which set the connection between the server and us and `Student_code` where we programmed the algorithms and th Gui representation to allow us to really visualize the graph and all its parameters and options.
+
+
+## Catch them All ! 
 
 ## Design 📌
 
-There are 3 principal classes defined in this project, we also used the different classes and interfaces from our last Python project [*EX3_OPP*](https://github.com/AnthonyAssayah/EX3_OPP.git), the interfaces are in the ```api``` package and their implementations can be found in ```classes``` package. Their properties and 
-methods are detailed in our previous project. 
+There are 3 principal classes defined in this project, we also used the different classes and interfaces from our last Python project [*EX3_OPP*](https://github.com/AnthonyAssayah/EX3_OPP.git), the interfaces are in the ```api``` package and their implementations can be found in ```classes``` package. Their properties and methods are detailed in our previous project. 
+ - *Node*
+ - *Edge*
+ - *DiGraph*
+ - *DiGraphAlgo*
 
-### <ins>***1 - The Client***<ins> 
+
+### <ins>***The Client***<ins> 
 
 This class is use to communicate with the server in order to import us all the data about the Pokemons and the Agents. 'client.py' contains a set of different fucntions:
 
@@ -32,3 +39,27 @@ This class is use to communicate with the server in order to import us all the d
 | `choose_next_edge(self, next_agent_node_json)` | Choose the next destination for a specific agent. |
 | `log_in(self, id_str)` | Used to enter the id as str to login and upload your score to the web server. |
 | `stop_connection(self)` | Used to close the connection. |
+  
+  <br />
+  
+  ### <ins>***The StudentCode***<ins> 
+
+In this class, we programmed the most efficient algorithm in reduce to have the best score, using Dijkstra for calculating the shortest path between an agent and Pokemon. Moreover, this class allow us to visualize the graph as a GUI with all the different components:
+
+  <br />
+  
+  | **Functions**      |    **Explanation**        |
+|-----------------|-----------------------|
+| `scale(data, min_screen, max_screen, min_data, max_data)` | Get the scale proportions and maximize it relatively to min and max screen dimentions. |
+| `my_scale(data, x=False, y=False)` | Decorate scale with the correct values. |
+| `assign_edges() -> []` | Assign the edge where the pokemon is from the json str. |
+| `get_edge(pokemon) -> (int, int)` | . |
+| `get_agent(id)` | Returns the agent having this id. |
+| `matchagent(call) -> int` | Gets call in the form of a tuple (src_id, dest_id) representing the edge on which the pokemon is located. returns assigned agent id.|
+| `shortest_path(src, dest)` | Returns the shortest path from src to dst using Dijkstra. |
+
+  <br />
+  
+
+You can read more details about our project in the Wiki page !
+![Pokemoji](https://github.com/jaylynch/pokemoji/raw/master/img/logo.png)
