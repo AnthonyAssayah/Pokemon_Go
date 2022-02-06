@@ -70,7 +70,7 @@ class DiGraphAlgo(GraphAlgoInterface):
         data = json_content
 
         for node in data['Nodes']:
-
+            
             if 'pos' in node.keys():
                 position = node['pos']
                 spl = position.split(",")
